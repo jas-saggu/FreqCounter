@@ -1,3 +1,16 @@
+import java.security.DomainCombiner
+
+fun <K,V> MutableMap<K,V>.combineWith(
+    curr: Map<K,V>,
+    combiner: (V?,V) -> V
+){
+    // this here is the totalcounter map
+    for ((key, newValue) in curr) {
+        val oldValue = this[key]
+        this[key] = combiner(oldValue, newValue)
+    }
+}
+
 fun main() {
     val totalCounter = mutableMapOf<String, Int>()
     var running = true
@@ -29,8 +42,10 @@ fun main() {
         // 6. Update both counters
         for (word in words) {
             currentCounter[word] = (currentCounter[word] ?: 0) + 1
-            totalCounter[word] = (totalCounter[word] ?: 0) + 1
+        //    totalCounter[word] = (totalCounter[word] ?: 0) + 1
         }
+
+        totalCounter.combineWith(currentCounter) { old, new -> (old ?: 0) + new }
 
         // 7. Print current count
         println("\nCurrent string: \"$input\"")
